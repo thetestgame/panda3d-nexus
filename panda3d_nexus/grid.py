@@ -105,7 +105,7 @@ class MapFileCell(object):
         contains = self._flags & self.Flags.Area.value
         return self._world_area_ids if contains else []
 
-    def get_terrain_height(self, vector: core.Vec3):
+    def get_terrain_height(self, vector: core.Vec3) -> float:
         """
         Returns the terrain's height at the supplied vector
         """

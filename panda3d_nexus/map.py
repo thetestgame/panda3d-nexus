@@ -135,6 +135,7 @@ class MapFile(object):
 
     def get_grid_exact(self, vector: core.Vec2) -> grid.MapFileGrid:
         """
+        Returns the grid at the exact grid coordinate specified
         """
 
         index = int(vector.get_y()) << 16 | int(vector.get_x())
