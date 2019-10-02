@@ -31,6 +31,13 @@ from direct.showbase.ShowBase import ShowBase
 
 from panda3d_nexus import map as nfmap
 
+# Set engine configuration
+core.load_prc_file_data("example", """
+window-title Heightmap Sample
+sync-video #f
+show-frame-rate-meter #t
+""")
+
 class SampleBase(ShowBase):
     """
     Showbase example for Panda3d
@@ -41,16 +48,49 @@ class SampleBase(ShowBase):
         Performs setup operations on the showbase
         """
 
+        print('Loading map...')
         self.map_file = nfmap.MapFile.read('example/Arcterra.nfmap')
-        grid_pos = core.Vec2(58, 58)
-        grid = self.map_file.get_grid_exact(grid_pos)
 
-        for cell_key in grid.cells:
-            cell = grid.cells[cell_key]
-            heightpoints = cell.heightmap
+        for grid_key in self.map_file.grids:
+            grid = self.map_file.grids[grid_key]
+            print('Processing grid: %s' % grid_key)
 
-            for point_key in heightpoints:
-                point = heightpoints[point_key]
+            data = []
+            px = 0
+            print('Reading cells')
+
+            for cell_key in grid.cells:
+                cell = grid.cells[cell_key]
+
+                for x in range(17):
+                    data.append([])
+                    for z in range(17):
+                        height = cell.get_terrain_height(core.Vec3(x, 0, z))
+                        height = abs(height)
+                        height = height / 255
+                        data[px].append(height)
+                    px += 1
+
+            print('Building image')
+            w = len(data)
+            h = 17
+            print('Size: %s, %s' % (w, h))
+            image = core.PNMImage(w, h)
+            image.fill(0, 0, 0)
+
+            for x in range(w):
+                for y in range(h):
+                    v = data[x][y]
+
+                    image.set_red(x, y, v)
+                    image.set_green(x, y, v)
+                    image.set_blue(x, y, v)
+
+            filepath = core.Filename('output/%s.png' % grid_key)
+            image.write(filepath)
+            print('Saving: %s ' % filepath.c_str())
+
+        print('Map loaded')
 
 def main():
     """
