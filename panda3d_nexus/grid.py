@@ -91,7 +91,7 @@ class MapFileCell(object):
                     for y in range(17):
                         self._heightmap[(x, y)] = reader.read_float()
             else:
-                raise NotImplementedError('%s is not implemented' % flag)
+                self.notify.error('%s is not implemented' % flag)
 
         if self.notify.getDebug():
             self.notify.debug('Loaded %s areas' % len(self._world_area_ids))
