@@ -69,7 +69,7 @@ class MapFile(object):
         """
 
         self.__read_header(reader)
-        self._asset = reader.read_string(encoding='utf-16')
+        self._asset = reader.read_string()
         
         grid_count = reader.read_uint()
         for grid_index in range(grid_count):
@@ -77,6 +77,9 @@ class MapFile(object):
             file_grid.read(reader)
 
             index = file_grid.x << 16 | file_grid.y
+            if index in self._grids:
+                raise ValueError('Index already exists: %s' % index)
+            
             self._grids[index] = file_grid
 
     def __read_header(self, reader: reader.BinaryReader):
@@ -123,7 +126,7 @@ class MapFile(object):
         index = gridy << 16 | gridx
         return self._grids.get(index, None)
 
-    def __get_grid_coord(self, vector: core.Vec3):
+    def __get_grid_coord(self, vector: core.Vec3) -> (float, float):
         """
         Returns the grid coordinate from the Vec3 position
         """

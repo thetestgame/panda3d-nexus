@@ -23,7 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from panda3d import core
+
 from enum import Enum
+
+from . import reader
 
 class MapFileCell(object):
     """
@@ -46,14 +50,14 @@ class MapFileCell(object):
         self._heightmap = {}
 
     @property
-    def x(self):
+    def x(self) -> float:
         return self._x
 
     @property
-    def y(self):
+    def y(self) -> float:
         return self._y
 
-    def read(self, reader):
+    def read(self, reader: reader.BinaryReader):
         """
         Reads the cells binary data
         """
@@ -76,11 +80,10 @@ class MapFileCell(object):
                 for y in range(17):
                     for x in range(17):
                         self._heightmap[(x, y)] = reader.read_float()
-                        print('test')
             else:
                 raise NotImplementedError('%s is not implemented' % flag)
 
-    def get_world_area_ids(self):
+    def get_world_area_ids(self) -> list:
         """
         Returns the cell's areas if present
         """
@@ -88,7 +91,7 @@ class MapFileCell(object):
         contains = self._flags & self.Flags.Area.value
         return self._world_area_ids if contains else []
 
-    def get_terrain_height(self, vector):
+    def get_terrain_height(self, vector: core.Vec3):
         """
         Returns the terrain's height at the supplied vector
         """
@@ -106,14 +109,14 @@ class MapFileGrid(object):
         self._cells = {}
 
     @property
-    def x(self):
+    def x(self) -> float:
         return self._x
 
     @property
-    def y(self):
+    def y(self) -> float:
         return self._y
 
-    def read(self, reader):
+    def read(self, reader: reader.BinaryReader):
         """
         Reads the map grids binary data
         """
@@ -124,7 +127,7 @@ class MapFileGrid(object):
         cell_count = reader.read_uint()
         for i in range(cell_count):
             cell = MapFileCell()
-            #cell.read(reader)
+            cell.read(reader)
 
             index = (cell.x << 16, cell.y)
             self._cells[index] = cell
