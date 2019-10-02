@@ -24,7 +24,7 @@ SOFTWARE.
 """
 
 world_grid_count = 128
-world_grid_origin = world_grid_count / 2
+world_grid_origin = int(world_grid_count / 2)
 grid_size = 512
 grid_cell_size=  32
-grid_cell_count = grid_size / grid_cell_size
+grid_cell_count = int(grid_size / grid_cell_size)

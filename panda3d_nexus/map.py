@@ -25,6 +25,9 @@ SOFTWARE.
 
 from panda3d import core
 
+from direct.directnotify.DirectNotifyGlobal import directNotify
+from direct.stdpy.file import *
+
 from . import reader, grid, constants
 
 import math
@@ -33,6 +36,9 @@ class MapFile(object):
     """
     Represents a NFMap file
     """
+
+    notify = directNotify.newCategory('map')
+    notify.setInfo(True)
 
     MAGIC = 1347241550
     VERSION = 2
@@ -43,11 +49,11 @@ class MapFile(object):
         self._grids = {}
 
     @property
-    def asset(self):
+    def asset(self) -> str:
         return self._asset
 
     @property
-    def grids(self):
+    def grids(self) -> dict:
         return self._grids
 
     @classmethod
@@ -57,6 +63,7 @@ class MapFile(object):
         """
 
         map_file = cls()
+        map_file.notify.info('Reading map file: %s' % filepath)
         with open(filepath, 'rb') as f:
             bin_reader = reader.BinaryReader(f)
             map_file.parse(bin_reader)
@@ -95,7 +102,7 @@ class MapFile(object):
         assert version == self.VERSION
         assert build == self.BUILD
 
-    def get_world_area_id(self, vector: core.Vec3) -> int:
+    def get_world_area_id(self, vector: core.Vec2) -> int:
         """
         Return world area id at the supplied position
         """
@@ -106,7 +113,7 @@ class MapFile(object):
 
         return grid.get_world_area_id(vector)
 
-    def get_terrain_height(self, vector: core.Vec3) -> float:
+    def get_terrain_height(self, vector: core.Vec2) -> float:
         """
         Returns the terrain height at the supplied position
         """
@@ -117,7 +124,7 @@ class MapFile(object):
 
         return grid.get_terrain_height(vector)
 
-    def get_grid(self, vector: core.Vec3) -> grid.MapFileGrid:
+    def get_grid(self, vector: core.Vec2) -> grid.MapFileGrid:
         """
         Returns the grid at the given position
         """
@@ -126,22 +133,27 @@ class MapFile(object):
         index = gridy << 16 | gridx
         return self._grids.get(index, None)
 
-    def __get_grid_coord(self, vector: core.Vec3) -> (float, float):
+    def get_grid_exact(self, vector: core.Vec2) -> grid.MapFileGrid:
+        """
+        """
+
+        index = int(vector.get_y()) << 16 | int(vector.get_x())
+        return self._grids.get(index, None)        
+
+    def __get_grid_coord(self, vector: core.Vec2) -> (float, float):
         """
         Returns the grid coordinate from the Vec3 position
         """
 
-        assert vector.__class__ == core.Vec3.__class__
-
-        x = math.floor(
-            constants.grid_cell_count * constants.world_grid_origin + vector.get_x() / constants.grid_size)
+        x = int(math.floor(
+            constants.grid_cell_count * constants.world_grid_origin + vector.get_x() / constants.grid_size))
 
         if x < 0 or x > constants.world_grid_count * constants.grid_cell_count:
-            raise ValueError('Position X: %s is invalid' % x)
+            self.notify.error('Position X: %s is invalid' % x)
 
-        z = math.floor(
-            constants.grid_cell_count * constants.world_grid_origin + vector.get_z() / constants.grid_size)
-        if z < 0 or z > constants.world_grid_count * constants.grid_cell_count:
-            raise ValueError('Position Y: %s is invalid' % z)
+        y = int(math.floor(
+            constants.grid_cell_count * constants.world_grid_origin + vector.get_y() / constants.grid_size))
+        if y < 0 or y > constants.world_grid_count * constants.grid_cell_count:
+            self.notify.error('Position Y: %s is invalid' % y)
 
-        return (x & constants.grid_cell_count - 1, z & constants.grid_cell_count - 1)
+        return (x, y)
