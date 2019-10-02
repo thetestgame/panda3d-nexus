@@ -69,7 +69,7 @@ class MapFile(object):
 
         return map_file
 
-    def parse(self, reader: reader.BinaryReader):
+    def parse(self, reader: reader.BinaryReader) -> None:
         """
         Parses the data contained in the map file
         """
@@ -88,7 +88,7 @@ class MapFile(object):
             
             self._grids[index] = file_grid
 
-    def __read_header(self, reader: reader.BinaryReader):
+    def __read_header(self, reader: reader.BinaryReader) -> None:
         """
         Reads the map file header
         """

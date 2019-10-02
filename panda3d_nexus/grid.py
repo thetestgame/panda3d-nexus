@@ -63,10 +63,14 @@ class MapFileCell(object):
         return self._y
 
     @property
-    def heightmap(self):
+    def heightmap(self) -> dict:
         return self._heightmap
 
-    def read(self, reader: reader.BinaryReader):
+    @property
+    def world_area_ids(self) -> dict:
+        return self._world_area_ids
+
+    def read(self, reader: reader.BinaryReader) -> None:
         """
         Reads the cells binary data
         """
@@ -165,7 +169,7 @@ class MapFileGrid(object):
     def cells(self) -> dict:
         return self._cells
 
-    def read(self, reader: reader.BinaryReader):
+    def read(self, reader: reader.BinaryReader) -> None:
         """
         Reads the map grids binary data
         """
