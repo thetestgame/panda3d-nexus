@@ -111,7 +111,6 @@ class MapFileCell(object):
 
         # Verify heightmap data is present
         if not len(self._heightmap):
-            self.notify.warning('Attempting to retrieve from an empty cell')
             return 0
 
         true_x = vector.get_x() + constants.world_grid_origin * constants.grid_size
