@@ -38,7 +38,6 @@ class MapFileCell(object):
     """
 
     notify = directNotify.newCategory('cell')
-    notify.setDebug(True)
 
     class Flags(Enum):
         Empty = 0

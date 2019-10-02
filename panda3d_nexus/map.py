@@ -38,7 +38,6 @@ class MapFile(object):
     """
 
     notify = directNotify.newCategory('map')
-    notify.setInfo(True)
 
     MAGIC = 1347241550
     VERSION = 2
