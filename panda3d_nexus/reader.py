@@ -31,21 +31,11 @@ class BinaryReader(object):
 
 	def read_string(self, size: int = None, encoding: str = "utf-8") -> str:
 		if size is None:
-			ret = self.read_cstring()
-		else:
-			ret = struct.unpack(self.endian + "%is" % (size), self.read(size))[0]
+			size = self.read_byte()
+
+		ret = struct.unpack(self.endian + "%is" % (size), self.read(size))[0]
 
 		return ret.decode(encoding)
-
-	def read_cstring(self) -> bytes:
-		ret = []
-		c = b""
-		while c != b"\0":
-			ret.append(c)
-			c = self.read(1)
-			if not c:
-				raise ValueError("Unterminated string: %r" % (ret))
-		return b"".join(ret)
 
 	def read_bool(self) -> bool:
 		return bool(struct.unpack(self.endian + "b", self.read(1))[0])
